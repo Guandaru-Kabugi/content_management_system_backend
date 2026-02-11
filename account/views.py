@@ -61,8 +61,8 @@ class SuperAdminRegisterView(CreateAPIView):
 class WhiteListedEmailDelete(DestroyAPIView):
     queryset = WhiteListedEmails.objects.all()
     permission_classes = [IsAuthenticated, IsSuperAdmin]
-    lookup_field = "email"
-    lookup_url_kwarg = "email"
+    lookup_field = "id"
+    lookup_url_kwarg = "id"
 
     @transaction.atomic
     def destroy(self, request, *args, **kwargs):
@@ -91,22 +91,35 @@ class UserDeleteView(DestroyAPIView):
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated, IsSuperAdmin]
     authentication_classes = [JWTAuthentication]
-    lookup_field = "email"
-    lookup_url_kwarg = "email"
+    lookup_field = "id"
+    lookup_url_kwarg = "id"
 
+    @transaction.atomic
     def destroy(self, request, *args, **kwargs):
-        user_to_delete = self.get_object()  # the user being targeted
-        current_user = request.user         # the logged-in user making the request
+        user_to_delete = self.get_object()
+        current_user = request.user
 
         # Prevent self-deletion
         if user_to_delete.id == current_user.id:
             return Response(
                 {"detail": "You cannot delete yourself."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_403_FORBIDDEN
             )
 
-        # Otherwise, proceed with normal deletion
-        return super().destroy(request, *args, **kwargs)
+        user_email = user_to_delete.email
+
+        # Delete user
+        self.perform_destroy(user_to_delete)
+
+        # Delete whitelist entry if it exists
+        WhiteListedEmails.objects.filter(
+            email__iexact=user_email
+        ).delete()
+
+        return Response(
+            {"message": f"User {user_email} deleted successfully"},
+            status=status.HTTP_200_OK
+        )
     
 class UpdateGetUserView(RetrieveUpdateAPIView):
     serializer_class = UpdateRetrieveSerializer
