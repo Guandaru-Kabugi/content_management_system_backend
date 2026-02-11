@@ -8,4 +8,8 @@ Handles the registration, login, getting, deleting, and updating of a user
 3. Deleting a user is also possible but requires the user to be a superadmin as well. 
 4. I Implemented a way to update key fields like password, username, full_name, and image. Email and Role cannot be changed once a user account is created
 5. I have implemented a way to get a user who is authenticated, to get details that can be dispIayed on the profile page.
-[I will also need to implement a whitelist that will be compared against when creating an admin user]
+6. The create whitelisted emails endpoints can also be used to get and list them. It requires authentication and user be a superadmin.
+7. I have also implemented the functionality where is_active is turned to false if a whitelisted email is removed. The superadmin can later delete that account.
+8. When a user is created, their email must first be whitelisted before being allowed to create an account.
+
+$$ this concludes the expected architecture for accounts service per the front-end expectations.

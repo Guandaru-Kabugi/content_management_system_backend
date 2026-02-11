@@ -1,10 +1,17 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions
-from .models import User
+from .models import User, WhiteListedEmails
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 
+
+class WhiteListedEmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WhiteListedEmails
+        fields = ['email']
+    def validate_email(self, value):
+        return value.lower().strip()
 class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
@@ -108,6 +115,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"Password" : "Password did not match"})
         return super().validate(attrs)
+    def validate_email(self, value):
+        value = value.lower().strip()
+
+        if not WhiteListedEmails.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError(
+                "This email is not authorized for registration."
+            )
+
+        return value
     def create(self, validated_data):
         validated_data.pop('password2', None)
         user = User.objects.create_user(

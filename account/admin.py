@@ -1,9 +1,15 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User
+from .models import User,WhiteListedEmails
 
 # Register your models here.
-
+@admin.register(WhiteListedEmails)
+class WhiteListedEmailsAdmin(admin.ModelAdmin):
+    list_display = ['id', 'email']
+    add_fieldsets = ((None, {
+        'classes': ('wide',),
+        'fields': ('email')
+    }))
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     list_display = ['id','role','username', 'full_name', 'email', 'image_url']

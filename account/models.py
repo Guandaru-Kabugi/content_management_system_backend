@@ -113,3 +113,5 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
 class WhiteListedEmails(models.Model):
     email = models.EmailField(max_length=400, unique=True)
+    def __str__(self):
+        return self.email
