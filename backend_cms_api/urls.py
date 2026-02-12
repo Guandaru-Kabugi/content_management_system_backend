@@ -39,7 +39,7 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('admin/', admin.site.urls),
     path('api/v1/', include("account.urls")),
-    # path('api/v1/', include("media_upload_app.urls")),
+    path('api/v1/', include("videos.urls")),
     # path('api/v1/', include("short_video_app.urls")),
     # path('api/v1/', include("short_video_app_superbase.urls")),
 ]

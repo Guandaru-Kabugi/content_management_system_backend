@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     #apps
     'account',
+    'videos',
 
     # Third-party
     'rest_framework',
