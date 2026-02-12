@@ -18,6 +18,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
 class CreateWhiteListedEmails(ListCreateAPIView):
     queryset = WhiteListedEmails.objects.all()
     permission_classes = [IsAuthenticated, IsSuperAdmin]
+    authentication_classes = [JWTAuthentication]
     serializer_class = WhiteListedEmailSerializer
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -47,6 +48,7 @@ class RegisterView(CreateAPIView):
 class SuperAdminRegisterView(CreateAPIView):
     serializer_class = SuperAdminRegisterSerializer
     permission_classes = [IsAuthenticated, IsSuperAdmin]
+    authentication_classes = [JWTAuthentication]
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -61,6 +63,7 @@ class SuperAdminRegisterView(CreateAPIView):
 class WhiteListedEmailDelete(DestroyAPIView):
     queryset = WhiteListedEmails.objects.all()
     permission_classes = [IsAuthenticated, IsSuperAdmin]
+    authentication_classes = [JWTAuthentication]
     lookup_field = "id"
     lookup_url_kwarg = "id"
 

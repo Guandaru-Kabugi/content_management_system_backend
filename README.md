@@ -12,4 +12,8 @@ Handles the registration, login, getting, deleting, and updating of a user
 7. I have also implemented the functionality where is_active is turned to false if a whitelisted email is removed. The superadmin can later delete that account.
 8. When a user is created, their email must first be whitelisted before being allowed to create an account.
 
-$$ this concludes the expected architecture for accounts service per the front-end expectations.
+$$ this concludes the expected architecture for accounts service per the front-end expectations. $$
+# videos api
+
+1. There will crud operations that allows creating, updating, getting all, and deleting a tag
+2. There will be crud operations that allow creating, updating, getting one, all, and deleting a video.
