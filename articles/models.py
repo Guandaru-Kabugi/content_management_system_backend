@@ -42,4 +42,4 @@ class Article (models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.title} by {self.creator}'
+        return f'{self.title} published on {self.year}'

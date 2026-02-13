@@ -10,7 +10,7 @@ class TagSerializer(serializers.ModelSerializer):
 class VideosSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     tag_ids = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Tag.objects.all(), write_only=True, source='tags'
+        many=True, queryset=Tag.objects.all(), write_only=True, source='tags', required=False
     )
     status_display = serializers.CharField(source='get_status_display', read_only=True)
 
@@ -43,7 +43,7 @@ class VideosSerializer(serializers.ModelSerializer):
 class VideosUpdateSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     tag_ids = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Tag.objects.all(), write_only=True, source='tags'
+        many=True, queryset=Tag.objects.all(), write_only=True, source='tags', required=False
     )
     status_display = serializers.CharField(source='get_status_display', read_only=True)
 

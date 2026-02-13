@@ -7,7 +7,7 @@ from videos.serializers import TagSerializer
 class ArticleSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     tag_ids = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Tag.objects.all(), write_only=True, source='tags'
+        many=True, queryset=Tag.objects.all(), write_only=True, source='tags', required=False
     )
     class Meta:
         model = Article
@@ -27,3 +27,4 @@ class ArticleSerializer(serializers.ModelSerializer):
             'visibility',
             'open_graph_image_url'
         ]
+        read_only_fields = ['id','posted_on', 'updated_on', 'recent_or_old']

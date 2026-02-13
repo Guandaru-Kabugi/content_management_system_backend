@@ -20,3 +20,7 @@ $$ this concludes the expected architecture for accounts service per the front-e
 3. Importantly, since most updates will be partial, FRONT-END will need to use PATCH instead of PUT because they user will not be passing all the data at once.
 
 # article api
+1. I have implemented an endpoint that allows the creation and listing of articles, including necessary fields like tags among others. The endpoint requires jwtauthentication so the user must be in the database.
+2. I have created a second endpoint that handles everything, including delete, update, or getting a single article
+3. These endpoints will allow Annuar to handle the data that will be sent from the front-end
+4. I will implement filtering that will enable Annuar to use the same endpoint to fetch articles, either in recent or those archived
