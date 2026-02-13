@@ -5,3 +5,9 @@ from .models import Tag,Videos
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'created_on', 'updated_on']
+
+@admin.register(Videos)
+class VideosAdmin(admin.ModelAdmin):
+    list_display = ['id','creator','title', 'cloudnary_url', 'weblink_url', 'thumbnail_url', 'status', 'visibility']
+    list_filter = ('creator', 'status', 'visibility')
+    

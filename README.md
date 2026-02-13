@@ -18,3 +18,5 @@ $$ this concludes the expected architecture for accounts service per the front-e
 1. I have created endpoints that support updating, deleting, getting a single tag, and also getting a list of tags.
 2. I have also implemented endpoints that support creating a new video, deleting a video, getting a single video, and getting a list of videos.
 3. Importantly, since most updates will be partial, FRONT-END will need to use PATCH instead of PUT because they user will not be passing all the data at once.
+
+# article api

@@ -40,6 +40,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include("account.urls")),
     path('api/v1/', include("videos.urls")),
-    # path('api/v1/', include("short_video_app.urls")),
+    path('api/v1/', include("articles.urls")),
     # path('api/v1/', include("short_video_app_superbase.urls")),
 ]
