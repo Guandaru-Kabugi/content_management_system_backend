@@ -36,3 +36,7 @@ $$ this concludes the expected architecture for accounts service per the front-e
 # notification api
 1. I have created the endpoints that support crud operations around patch updates, deleting, creating, and getting.
 2. The next step will be to implement resend_email to send emails to users when different objects are created.
+
+commands on celery
+1. celery -A backend_cms_api worker --pool=solo --loglevel=info
+2. docker run -d -p 6379:6379 redis
