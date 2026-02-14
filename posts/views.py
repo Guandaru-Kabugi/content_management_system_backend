@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from notifications.models import Notification
 import re
 from bs4 import BeautifulSoup
+from .send_email import notify_all_users
 
 
 # Create your views here.
@@ -23,11 +24,12 @@ class CreatePostView(generics.ListCreateAPIView):
         instance = serializer.save()
 
          # Generate a notification
-        Notification.objects.create(
+        notification = Notification.objects.create(
             user=request.user,  # the current authenticated user
             title=instance.title,
             content=self.generate_notification_content(instance.content)
         )
+        notify_all_users.delay(notification.id)
 
         return Response(
             {"message": f"{instance.title} has been created successfully"},
