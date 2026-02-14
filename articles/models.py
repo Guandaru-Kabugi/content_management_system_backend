@@ -22,6 +22,7 @@ class Article (models.Model):
     ])
     external_url = models.URLField(max_length=1000)
     thumbnail_url = models.URLField(max_length=1000, null=True,blank=True)
+    is_publication = models.BooleanField(default=False)
 
     posted_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)

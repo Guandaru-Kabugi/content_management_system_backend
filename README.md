@@ -13,14 +13,26 @@ Handles the registration, login, getting, deleting, and updating of a user
 8. When a user is created, their email must first be whitelisted before being allowed to create an account.
 
 $$ this concludes the expected architecture for accounts service per the front-end expectations. $$
-# videos api
+
+# videos api (podcasts and short videos)
 
 1. I have created endpoints that support updating, deleting, getting a single tag, and also getting a list of tags.
 2. I have also implemented endpoints that support creating a new video, deleting a video, getting a single video, and getting a list of videos.
 3. Importantly, since most updates will be partial, FRONT-END will need to use PATCH instead of PUT because they user will not be passing all the data at once.
+4. The source field can then be used for podcasts
 
-# article api
+# article api (recent articles, archives, and publications)
 1. I have implemented an endpoint that allows the creation and listing of articles, including necessary fields like tags among others. The endpoint requires jwtauthentication so the user must be in the database.
 2. I have created a second endpoint that handles everything, including delete, update, or getting a single article
 3. These endpoints will allow Annuar to handle the data that will be sent from the front-end
-4. I will implement filtering that will enable Annuar to use the same endpoint to fetch articles, either in recent or those archived
+4. I will implement filtering that will enable Annuar to use the same endpoint to fetch articles, either in recent or those archived.
+5. Importantly, this API will also be used on PUBLICATIONS by passing is_publication as True and then using it to filter in the front-end to display recent publications.
+
+# posts api (commentaries and news)
+1. I first implement create and display list of commentaries or news. The remaining functionality is a filter that will allow the separation between commentaries and news.
+2. I have implemented triggering Notification Model which creates a new notification with details that will be used to send an email to the users.
+3. I also implemented retrieving updating, and deleting of posts or commentaries.
+4. The remaining part is adding to update and then testing everything
+# notification api
+1. I have created the endpoints that support crud operations around patch updates, deleting, creating, and getting.
+2. The next step will be to implement resend_email to send emails to users when different objects are created.

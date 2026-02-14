@@ -41,5 +41,6 @@ urlpatterns = [
     path('api/v1/', include("account.urls")),
     path('api/v1/', include("videos.urls")),
     path('api/v1/', include("articles.urls")),
-    # path('api/v1/', include("short_video_app_superbase.urls")),
+    path('api/v1/', include("posts.urls")),
+    path('api/v1/', include("notifications.urls")),
 ]

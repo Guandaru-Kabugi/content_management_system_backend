@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'account',
     'videos',
     'articles',
+    'posts',
+    'notifications',
 
     # Third-party
     'rest_framework',
