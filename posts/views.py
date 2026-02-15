@@ -25,9 +25,10 @@ class CreatePostView(generics.ListCreateAPIView):
 
          # Generate a notification
         notification = Notification.objects.create(
-            user=request.user,  # the current authenticated user
+            user=request.user,
+            action="created",
             title=instance.title,
-            content=self.generate_notification_content(instance.content)
+            content=generate_notification_content(instance.content)
         )
         notify_all_users.delay(notification.id)
 
@@ -35,25 +36,6 @@ class CreatePostView(generics.ListCreateAPIView):
             {"message": f"{instance.title} has been created successfully"},
             status=status.HTTP_201_CREATED
         )
-    def generate_notification_content(self, html_content):
-        soup = BeautifulSoup(html_content, "html.parser")
-        
-        # Replace <br> and <p> with newline
-        for br in soup.find_all("br"):
-            br.replace_with("\n")
-        for p in soup.find_all("p"):
-            p.insert_before("\n")
-        
-        text = soup.get_text(separator="\n", strip=True)
-        
-        # Normalize multiple newlines
-        text = re.sub(r'\n+', '\n', text)
-        
-        # Optional: truncate to 150 chars
-        if len(text) > 150:
-            text = text[:150].rstrip() + "…"
-        
-        return text
     
 class UpdateGetDeleteAPost(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
@@ -71,7 +53,19 @@ class UpdateGetDeleteAPost(generics.RetrieveUpdateDestroyAPIView):
             partial=partial
         )
         serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+        instance = serializer.save()
+
+
+        # Generate a notification
+        notification = Notification.objects.create(
+            user=request.user,
+            action="updated",
+            title=instance.title,
+            content=generate_notification_content(instance.content)
+        )
+        notify_all_users.delay(notification.id)
+
+
 
         return Response(
             {
@@ -91,3 +85,23 @@ class UpdateGetDeleteAPost(generics.RetrieveUpdateDestroyAPIView):
             },
             status=status.HTTP_200_OK
         )
+#generate notification human friendly languag
+def generate_notification_content(html_content):
+        soup = BeautifulSoup(html_content, "html.parser")
+        
+        # Replace <br> and <p> with newline
+        for br in soup.find_all("br"):
+            br.replace_with("\n")
+        for p in soup.find_all("p"):
+            p.insert_before("\n")
+        
+        text = soup.get_text(separator="\n", strip=True)
+        
+        # Normalize multiple newlines
+        text = re.sub(r'\n+', '\n', text)
+        
+        # Optional: truncate to 150 chars
+        if len(text) > 150:
+            text = text[:150].rstrip() + "…"
+        
+        return text

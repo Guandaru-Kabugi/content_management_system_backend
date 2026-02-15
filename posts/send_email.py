@@ -14,28 +14,29 @@ resend.api_key = settings.API_KEY_RESEND_EMAIL
 @shared_task
 def notify_all_users(notification_id):
     notification = Notification.objects.get(id=notification_id)
-
-    users = User.objects.filter(is_active=True).exclude(email="").values_list("email", flat=True)
     user = notification.user
 
-    # Convert newlines for HTML email
     formatted_content = notification.content.replace("\n", "<br>")
-    print(f"Sending email for notification {notification.id} by {user.username}")
-    print(f"HTML content:\n{formatted_content}")
+
+    if notification.action == "created":
+        heading = f"🆕 A new post was published by {user.username}"
+    else:
+        heading = f"✏️ A post was updated by {user.username}"
 
     resend.Emails.send({
-            "from": "Acme <onboarding@resend.dev>",
-            "to": "westernjonah@gmail.com",
-            "subject": notification.title,
-            "html": f"""
-                <h4> A Post published by {user.username}</h4>
-                <br>
-                <br>
-                <p>{formatted_content}</p>
-                <hr>
-                <small>Created on {notification.created_on.strftime("%Y-%m-%d %H:%M")}</small>
-            """
-        })
+        "from": "Acme <onboarding@resend.dev>",
+        "to": "westernjonah@gmail.com",
+        "subject": notification.title,
+        "html": f"""
+            <h3>{heading}</h3>
+            <h4>{notification.title}</h4>
+            <br>
+            <p>{formatted_content}</p>
+            <hr>
+            <small>{notification.action.capitalize()} on 
+            {notification.created_on.strftime("%Y-%m-%d %H:%M")}</small>
+        """
+    })
 
     # for email in users:
     #     resend.Emails.send({
