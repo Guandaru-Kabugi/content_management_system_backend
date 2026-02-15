@@ -6,6 +6,8 @@ from .models import Article
 from .serializers import ArticleSerializer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 # Create your views here.
 
@@ -14,6 +16,23 @@ class CreateArticleView(generics.ListCreateAPIView):
     serializer_class = ArticleSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    # 🔎 Partial search (LIKE %query%)
+    search_fields = ["title", "description"]
+
+    # 🎯 Exact filtering
+    filterset_fields = [
+        "is_publication",
+        "recent_or_old",
+        "status",
+        "visibility",
+        "year",
+    ]
+
+    ordering_fields = ["posted_on", "year"]
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

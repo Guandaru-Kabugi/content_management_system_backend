@@ -41,3 +41,27 @@ $$ this concludes the expected architecture for accounts service per the front-e
 commands on celery
 1. celery -A backend_cms_api worker --pool=solo --loglevel=info
 2. docker run -d -p 6379:6379 redis
+
+# Filtering Capabilities
+examples of filtering queries that will be used
+For Articles
+1. /api/articles/?is_publication=true
+2. /api/articles/?is_publication=true&recent_or_old=Recent
+3. /api/articles/?is_publication=true&recent_or_old=Archive
+4. /api/articles/?status=Published&visibility=true
+For Posts
+1. /api/v1/posts/?is_commentary=true&status=Published
+2. /api/v1/posts/?is_commentary=true
+3. /api/v1/posts/?status=Published
+4. /api/v1/posts/?visibility=true
+For Videos
+1. /api/v1/videos/?source=Spotify&visibility=true&status=Draft
+# Search Capabilities
+For Articles
+1. search by title, description
+For Posts
+1. Search by title, description, content
+For Videos
+1. Search by title, description
+# Pagination
+1. I have set pagination for the different lists to 25

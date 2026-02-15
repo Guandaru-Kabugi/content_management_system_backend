@@ -9,6 +9,8 @@ from notifications.models import Notification
 import re
 from bs4 import BeautifulSoup
 from .send_email import notify_all_users
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 
 # Create your views here.
@@ -18,6 +20,22 @@ class CreatePostView(generics.ListCreateAPIView):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    # 🔎 Partial search (LIKE %query%)
+    search_fields = ["title", "description", "content"]
+
+    # 🎯 Exact filtering
+    filterset_fields = [
+        "is_commentary",
+        "status",
+        "visibility",
+    ]
+
+    ordering_fields = ["date_posted", "date_updated"]
+
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

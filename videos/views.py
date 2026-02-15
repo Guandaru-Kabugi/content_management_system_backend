@@ -8,6 +8,10 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import Tag, Videos
 from .serializers import TagSerializer, VideosSerializer,VideosUpdateSerializer
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+
+
 # Create your views here.
 class TagViewSet(ModelViewSet):
     queryset = Tag.objects.all().order_by('-created_on')
@@ -21,6 +25,22 @@ class CreateVideoView(ListCreateAPIView):
     serializer_class = VideosSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    # 🔎 Partial search (LIKE %query%)
+    search_fields = ["title", "description"]
+
+    # 🎯 Exact filtering
+    filterset_fields = [
+        "source",
+        "status",
+        "visibility",
+    ]
+
+    ordering_fields = ["posted_on", "updated_on"]
+
+
 
     def perform_create(self, serializer):
         serializer.save()

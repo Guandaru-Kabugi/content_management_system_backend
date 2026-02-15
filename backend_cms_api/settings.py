@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'celery',
     'background_task',
+    "django_filters",
 
 ]
 
@@ -189,12 +190,20 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         # optionally, you can keep session auth for the browsable API
         'rest_framework.authentication.SessionAuthentication',
     ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 25
 }
+
 API_KEY_RESEND_EMAIL = os.getenv("API_KEY")
 
 # set the celery broker url
@@ -207,4 +216,3 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 # set the celery timezone
 CELERY_TIMEZONE = 'UTC'
-
