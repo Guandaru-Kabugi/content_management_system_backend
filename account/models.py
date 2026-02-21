@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from rest_framework.exceptions import ValidationError
+import uuid
 
 
 class UserManager(BaseUserManager):
@@ -113,5 +114,8 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
 class WhiteListedEmails(models.Model):
     email = models.EmailField(max_length=400, unique=True)
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    is_used = models.BooleanField(default=False)
+    created_on = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.email

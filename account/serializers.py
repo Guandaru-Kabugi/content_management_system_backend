@@ -9,7 +9,8 @@ from django.contrib.auth import authenticate
 class WhiteListedEmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = WhiteListedEmails
-        fields = ['email']
+        fields = ['email', 'token', 'is_used', 'created_on']
+        read_only_fields = ['token', 'is_used', 'created_on']
     def validate_email(self, value):
         return value.lower().strip()
 class UserSerializer(serializers.ModelSerializer):

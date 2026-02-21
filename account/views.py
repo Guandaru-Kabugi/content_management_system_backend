@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .permissions import IsSuperAdmin
+from .send_email_invite import send_invite_email
 
 # Create your views here.
 
@@ -24,6 +25,9 @@ class CreateWhiteListedEmails(ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
+         # 🔥 Send invite email
+        send_invite_email.delay(instance.id)
+
 
         return Response(
             {"message": f"{instance.email} has been whitelisted successfully"},
@@ -32,14 +36,43 @@ class CreateWhiteListedEmails(ListCreateAPIView):
 
 
 class RegisterView(CreateAPIView):
-    queryset = User.objects.all() 
+    queryset = User.objects.all()
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        token = request.query_params.get("token")
+
+        if not token:
+            return Response(
+                {"error": "Invitation token is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        #  Validate invite
+        try:
+            invite = WhiteListedEmails.objects.get(
+                token=token,
+                is_used=False
+            )
+        except WhiteListedEmails.DoesNotExist:
+            return Response(
+                {"error": "Invalid or expired invite."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 🔒 Force email from whitelist (prevent tampering)
+        data = request.data.copy()
+        data["email"] = invite.email
+
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+
+        with transaction.atomic():
+            user = serializer.save()
+            invite.is_used = True
+            invite.save()
+
         return Response(
             {"message": f"User with the email {user.email} has been created"},
             status=status.HTTP_201_CREATED
