@@ -11,6 +11,7 @@ Handles the registration, login, getting, deleting, and updating of a user
 6. The create whitelisted emails endpoints can also be used to get and list them. It requires authentication and user be a superadmin.
 7. I have also implemented the functionality where is_active is turned to false if a whitelisted email is removed. The superadmin can later delete that account.
 8. When a user is created, their email must first be whitelisted before being allowed to create an account.
+9. I have implemented send_invite which invites added users to register 
 
 $$ this concludes the expected architecture for accounts service per the front-end expectations. $$
 
