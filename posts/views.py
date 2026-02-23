@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from .send_email import notify_all_users
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django.db import transaction
 
 
 # Create your views here.
@@ -34,8 +35,8 @@ class CreatePostView(generics.ListCreateAPIView):
     ]
 
     ordering_fields = ["date_posted", "date_updated"]
-
-
+    
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -48,7 +49,14 @@ class CreatePostView(generics.ListCreateAPIView):
             title=instance.title,
             content=generate_notification_content(instance.content)
         )
-        notify_all_users.delay(notification.id)
+        try:
+            notify_all_users(notification.id)
+
+        except Exception as e:
+            return Response(
+                {"error": f"Failed to send notification email: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         return Response(
             {"message": f"{instance.title} has been created successfully"},
@@ -61,6 +69,7 @@ class UpdateGetDeleteAPost(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -81,8 +90,14 @@ class UpdateGetDeleteAPost(generics.RetrieveUpdateDestroyAPIView):
             title=instance.title,
             content=generate_notification_content(instance.content)
         )
-        notify_all_users.delay(notification.id)
 
+        try:
+            notify_all_users(notification.id)
+        except Exception as e:
+            return Response(
+                {"error": f"Failed to send notification email: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
         return Response(

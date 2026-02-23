@@ -10,6 +10,7 @@ class Post(models.Model):
     )
 
     author = models.CharField(max_length=150, default="Jonah Western")
+    featured_image_url = models.URLField(max_length=1000, null=True, blank=True)
     title = models.CharField(max_length=200)
     date_posted = models.DateField(default=timezone.now)
     date_updated = models.DateField(auto_now=True)

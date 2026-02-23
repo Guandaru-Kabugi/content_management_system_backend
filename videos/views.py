@@ -45,6 +45,8 @@ class CreateVideoView(ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
+        
+
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
 
@@ -62,6 +64,8 @@ class RetrieveUpdateVideoView(RetrieveUpdateAPIView):
     authentication_classes = [JWTAuthentication]
     lookup_field = "id"
 
+
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()

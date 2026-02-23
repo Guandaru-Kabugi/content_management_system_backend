@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db import transaction
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
@@ -32,7 +33,8 @@ class CreateArticleView(generics.ListCreateAPIView):
     ]
 
     ordering_fields = ["posted_on", "year"]
-
+    
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -48,6 +50,7 @@ class UpdateGetDeleteAnArticle(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -67,7 +70,8 @@ class UpdateGetDeleteAnArticle(generics.RetrieveUpdateDestroyAPIView):
             },
             status=status.HTTP_200_OK
         )
-
+    
+    @transaction.atomic
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)

@@ -1,4 +1,6 @@
 
+from time import time
+
 import resend
 from celery import shared_task
 from django.contrib.auth import get_user_model
@@ -12,13 +14,14 @@ User = get_user_model()
 resend.api_key = settings.API_KEY_RESEND_EMAIL
 
 
-@shared_task
-def send_invite_email(whitelist_obj_id):
+
+def send_invite_email(whitelist_obj_id, retries=3):
 
     whitelist_obj = WhiteListedEmails.objects.get(id=whitelist_obj_id)
     invite_link = f"http://localhost:8000/api/v1/user/register/?token={whitelist_obj.token}"
-
-    resend.Emails.send({
+    for attempt in range(retries):
+        try:
+            resend.Emails.send({
         "from": "Acme <onboarding@resend.dev>",
         "to": whitelist_obj.email,
         "subject": "You're invited to register",
@@ -34,3 +37,10 @@ def send_invite_email(whitelist_obj_id):
             <p>This link will only work once.</p>
         """
     })
+            break  # Exit loop if email sent successfully
+        except Exception as e:
+            if attempt < retries - 1:
+                time.sleep(2)
+                continue  # Retry
+            else:
+                raise e  # Raise exception if all retries fail

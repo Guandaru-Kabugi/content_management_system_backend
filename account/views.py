@@ -21,12 +21,20 @@ class CreateWhiteListedEmails(ListCreateAPIView):
     permission_classes = [IsAuthenticated, IsSuperAdmin]
     authentication_classes = [JWTAuthentication]
     serializer_class = WhiteListedEmailSerializer
+
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
          # 🔥 Send invite email
-        send_invite_email.delay(instance.id)
+        try:
+            send_invite_email(instance.id)
+        except Exception as e:
+            return Response(
+                {"error": f"Failed to send invite email: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
         return Response(
@@ -40,6 +48,7 @@ class RegisterView(CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         token = request.query_params.get("token")
 
@@ -83,6 +92,7 @@ class SuperAdminRegisterView(CreateAPIView):
     permission_classes = [IsAuthenticated, IsSuperAdmin]
     authentication_classes = [JWTAuthentication]
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

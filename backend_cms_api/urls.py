@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path,include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
+from health_check.views import HealthCheckView
 from drf_yasg import openapi
 
 schema_view = get_schema_view(
@@ -43,4 +44,5 @@ urlpatterns = [
     path('api/v1/', include("articles.urls")),
     path('api/v1/', include("posts.urls")),
     path('api/v1/', include("notifications.urls")),
+    path("health/", HealthCheckView.as_view()),
 ]

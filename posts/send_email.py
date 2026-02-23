@@ -1,4 +1,6 @@
 
+from time import time
+
 import resend
 from celery import shared_task
 from django.contrib.auth import get_user_model
@@ -11,8 +13,8 @@ User = get_user_model()
 resend.api_key = settings.API_KEY_RESEND_EMAIL
 
 
-@shared_task
-def notify_all_users(notification_id):
+
+def notify_all_users(notification_id, retries=5):
     notification = Notification.objects.get(id=notification_id)
     user = notification.user
 
@@ -22,8 +24,10 @@ def notify_all_users(notification_id):
         heading = f"🆕 A new post was published by {user.username}"
     else:
         heading = f"✏️ A post was updated by {user.username}"
-
-    resend.Emails.send({
+    
+    for attempt in range(retries):
+        try:
+            resend.Emails.send({
         "from": "Acme <onboarding@resend.dev>",
         "to": "westernjonah@gmail.com",
         "subject": notification.title,
@@ -37,16 +41,10 @@ def notify_all_users(notification_id):
             {notification.created_on.strftime("%Y-%m-%d %H:%M")}</small>
         """
     })
-
-    # for email in users:
-    #     resend.Emails.send({
-    #         "from": "Acme <onboarding@resend.dev>",
-    #         "to": "westernjonah@gmail.com",
-    #         "subject": notification.title,
-    #         "html": f"""
-    #             <h2>The post by the title : {notification.title} has been created by user with the email {user.email} </h2>
-    #             <p>{formatted_content}</p>
-    #             <hr>
-    #             <small>Created on {notification.created_on.strftime("%Y-%m-%d %H:%M")}</small>
-    #         """
-    #     })
+            break  # Exit loop if email sent successfully
+        except Exception as e:
+            if attempt < retries - 1:
+                time.sleep(2)
+                continue  # Retry
+            else:
+                raise e  # Raise exception if all retries fail
